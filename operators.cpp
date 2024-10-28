@@ -39,6 +39,40 @@ uint32_t Operators::add() {
     return num1 + num2;
 }
 
+// uint32_t Operators::cmd() {}
+
+uint32_t Operators::_and(){
+    return num1 & num2;    
+}
+
+int32_t Operators::asr(){
+    int32_t shift1, shift2;
+    return  shift1 >> num1, shift2 >> num2;
+}
+
+// uint32_t Operators::lsr(){}
+
+// uint32_t Operators::lsl(){}
+
+uint32_t Operators::_not(){
+    return ~num1, ~num2;
+}
+
+uint32_t Operators::orr(){
+    return num1 | num2;
+}
+
+uint32_t Operators::sub(){
+    return num1 - num2;
+}
+
+uint32_t Operators::_xor(){
+    return num1 ^ num2;
+}
+
+
+
+
 bool Operators::checkOverflow(uint32_t res) {
     return res < num1 || res < num2;
 }

@@ -27,6 +27,16 @@ class Operators {
         void setNum2(uint32_t);
 
         uint32_t add();
+        uint32_t cmd();
+        uint32_t _and();
+        int32_t asr();
+        uint32_t lsr();
+        uint32_t lsl();
+        uint32_t _not();
+        uint32_t orr();
+        uint32_t sub();
+        uint32_t _xor();
+
 
         bool checkOverflow(uint32_t res);
 };

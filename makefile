@@ -1,4 +1,4 @@
-output: main.o operators.o
+main: main.o operators.o
 	g++ -o output main.o operators.o
 
 main.o: main.cpp operators.h
