@@ -1,89 +1,85 @@
-// Author: Kaiden Bell
-// Date: 10/28/24
-// Ver: 2.0
-
-
 #include "operators.h"
-
 #include <fstream>
+#include <iostream>
+#include <sstream>
 
-using namespace std;
+
+// only used to parse together the strings
+string trim(const string& str) {
+    size_t start = str.find_first_not_of(" \t"); // find non-whitespace char, (basically anything not a space, or a tab)
+    size_t end = str.find_last_not_of(" \t"); // find last non-whitespace char (where the whitespace ends, and what we can ignore)
+    return (start == string::npos) ? "" : str.substr(start, end - start + 1); // if we cant find a non-whitespace char, just return sum empty, if it has characters, then just return the new substring
+}
 
 int main(int argc, char* argv[]) {
-
     if (argc < 2) {
-        return 1; // if there is no file, just exit;
-    }  
+        cout << "Error location File!" << endl;
+        return 1;
+    }
 
     string infile_name = argv[1];
-
     ifstream infile(infile_name);
 
+    if (!infile.is_open()) {
+        cout << "Error opening file: " << infile_name << endl;
+        return 1;
+    }
+
     string line;
+    Operators op;
 
-    // Read file line by line
-    while (std::getline(infile, line)) {
-        string operation = "";
-        string num1_str = "";
-        string num2_str = "";
-        int stg = 0; // 0 = operation, 1 = num1, 2 = num2
+    while (getline(infile, line)) {
+        istringstream iss(line);
+        string operation, num1_str, num2_str;
+        iss >> operation >> num1_str >> num2_str; // split the input in the file into two parts
 
-        // Loop through each character of the line
-        for (char c : line) {
-            if (c == ' ') {
-                stg++;
-                continue; // Skip spaces, move to the next stage
-            }
+        operation = trim(operation);
+        num1_str = trim(num1_str);
+        num2_str = trim(num2_str);
 
-            if (stg == 0) {
-                operation += c; // Build the operation string (e.g. "ADD")
-            } else if (stg == 1) {
-                num1_str += c; // Build the first hex number string
-            } else if (stg == 2) {
-                num2_str += c; // Build the second hex number string
-            }
+        uint32_t num1 = stoul(num1_str, nullptr, 16);
+        uint32_t num2 = (!num2_str.empty()) ? stoul(num2_str, nullptr, 16) : 0;
+        
+        op.setNum1(num1);
+        op.setNum2(num2);
+
+        bool setFlags = (operation.back() == 'S'); // handle the operation like normal, instead of ADDS, just ADD
+        if (setFlags) {
+            operation.pop_back();
         }
 
-        // Convert hex strings to integers (ignoring the "0x" part)
-        uint32_t num1 = stoul(num1_str, nullptr, 16);
-        uint32_t num2 = stoul(num2_str, nullptr, 16);
-
-
-        // Perform the operation if valid
+        uint32_t result;
+        // not using switch statement, reqs enums
         if (operation == "ADD") {
-            Operators op(num1, num2);
-            uint32_t res = op.add();
-            cout << "ADD: 0x" << std::hex << op.getNum1() << " + " << "0x" << op.getNum2() << " : 0x" << std::hex << res << endl;
-            cout << "Overflow: " << (op.checkOverflow(res) ? "Yes" : "No") << endl;
-        } else if (operation == "CMD") {
-            // uint32_t res = op.cmd();
-            // cout << "CMD: 0x" << std::hex << op.getNum1() << " + " << "0x" << op.getNum2() << " : 0x" << std::hex << res << endl;
-            cout << "Not yet Implemented!" << endl;
+            result = op.add();
         } else if (operation == "AND") {
-            Operators op(num1, num2);
-            uint32_t res = op._and();
-            cout << "AND: 0x" << std::hex << op.getNum1() << " & " << "0x" << op.getNum2() << " : 0x" << std::hex << res << endl;
-
+            result = op._and();
         } else if (operation == "ASR") {
-            // Operators op(num1, num2);
-            // int32_t res = op.asr();
-            // cout << "ASR: 0x" << std::hex << op.getNum1() << "AND" << "0x" << std::hex << op.getNum1() << " = " << "0x" << std::hex << res << endl;
-            cout << "Not yet Implemented!" << endl;
+            result = op.asr().first;
         } else if (operation == "LSR") {
-            cout << "Not yet Implemented!" << endl;
+            result = op.lsr().first;
         } else if (operation == "LSL") {
-            cout << "Not yet Implemented!" << endl;
+            result = op.lsl().first;
         } else if (operation == "NOT") {
-            cout << "Not yet Implemented!" << endl;
+            result = op._not().first;
         } else if (operation == "ORR") {
-            cout << "Not yet Implemented!" << endl;
+            result = op.orr();
         } else if (operation == "SUB") {
-            cout << "Not yet Implemented!" << endl;
+            result = op.sub();
         } else if (operation == "XOR") {
-            cout << "Not yet Implemented!" << endl;
+            result = op._xor();
         } else {
             cout << "Unknown Operator used: " << operation << endl;
+            continue;
         }
+
+
+        if (setFlags){ 
+            op.updateFlags(result);
+        }
+
+        cout << operation << " 0x" << hex << num1 << " 0x" << num2 << ": 0x" << result << endl;
+        cout << "N: " << op.getNFlag() << " Z: " << op.getZFlag() << endl;
     }
 
     infile.close();
