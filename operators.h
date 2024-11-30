@@ -1,6 +1,6 @@
 // Author: Kaiden Bell
-// Date: 9/27/24
-// Ver: 1.0
+// Date: 11/29/24
+// Ver: 3.0
 
 #ifndef OPERATORS_H
 #define OPERATORS_H
@@ -17,10 +17,15 @@ class Operators {
         uint32_t num1, num2;
         int n_Flag = 0;
         int z_Flag = 0;
+        int c_Flag = 0;
+        int v_Flag = 0;
     public:
         Operators();
         Operators(uint32_t, uint32_t);
         Operators(const Operators& rhs);
+
+
+        uint32_t registers[8];
 
         // Getters & Setters
         uint32_t getNum1() const;
@@ -29,6 +34,8 @@ class Operators {
 
         int getNFlag() const;
         int getZFlag() const;
+        int getCFlag() const;
+        int getVFlag() const;
 
         void setNum1(uint32_t);
         void setNum2(uint32_t);
@@ -50,10 +57,11 @@ class Operators {
         uint32_t _xor();
 
 
-        void updateFlags(uint32_t res);
+        void updateFlags(uint32_t);
+        void updateFlagsSub(uint32_t, uint32_t, uint32_t);
+        void cmp(uint32_t, uint32_t);
+        void tst(uint32_t, uint32_t);
 
-
-
-        bool checkOverflow(uint32_t res);
+        bool checkOverflow(uint32_t);
 };
 #endif
